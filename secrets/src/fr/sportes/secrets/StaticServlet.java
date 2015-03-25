@@ -1,8 +1,11 @@
 package fr.sportes.secrets;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
@@ -20,13 +23,15 @@ public class StaticServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	public static final Logger log = Logger.getLogger("fr.sportes");
-
+	
 	public byte[] getResource(String name) {
 		try {
 			// String n = name.startsWith("/x") ? name.substring(2) : name;
 			InputStream is = servletConfig.getServletContext().getResourceAsStream(name);
 			if (is == null)
 				return null;
+			if (name.endsWith(".css") || name.endsWith(".html") || name.endsWith(".appcache"))
+				return convert(is);
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			byte[] buf = new byte[4096];
 			int l = 0;
@@ -37,12 +42,72 @@ public class StaticServlet extends HttpServlet {
 			return null;
 		}
 	}
+	
+	private byte[] convert(InputStream is) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		String line;
+		StringBuffer sb = new StringBuffer();
+		while( (line = br.readLine()) != null) {
+			int lg = line.length();
+			int s = 0;
+			int i;
+			int j;
+			while (s < lg) {
+				i = line.indexOf('$', s);
+				if (i == -1) {
+					sb.append(line.substring(s, lg));
+					s = lg;
+				} else {
+					if (i != s)
+						sb.append(line.substring(s, i));
+					if (i == lg-1) {
+						sb.append(line.substring(i, lg));
+						s = lg;
+					} else {
+						j = line.indexOf('$', i+1);
+						if (j == -1) {
+							sb.append(line.substring(i, lg));
+							s = lg;
+						} else {
+							if (j == i+1){
+								sb.append(line.substring(i, j+1));
+								s = j + 1;
+							} else {
+								String w = line.substring(i+1, j);
+								String r = versions.getProperty(w);
+								if (r == null)
+									sb.append(line.substring(i, j+1));								
+								else
+									sb.append(r);
+								s = j + 1;
+							}
+						}
+					}
+				}
+			}
+			sb.append("\n");
+		}
+		return sb.toString().getBytes("UTF-8");
+	}
 
 	private ServletConfig servletConfig;
+	
+	private Properties versions;
 
 	@Override public void init(ServletConfig config) throws ServletException {
 		servletConfig = config;
-		version = servletConfig.getInitParameter("version");
+		// version = servletConfig.getInitParameter("version");
+		versions = new Properties();
+		try {
+			InputStream is = servletConfig.getServletContext().getResourceAsStream("/versions.properties");
+			if (is != null)
+				versions.load(is);
+			else
+				log.severe("Static - echec chargement de version.properties");
+		} catch (IOException e) {
+			log.severe("Static - echec chargement de version.properties");
+		}
+		version = versions.getProperty("version_secrets");
 	}
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
