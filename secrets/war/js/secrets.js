@@ -556,6 +556,11 @@ Secrets = {
 
 	/*****************************************************************/
 	init : function(){
+		var href = window.location.href;
+		if (href.startsWith("http://secrets")){
+			var x = "https:" + href.substring(5);
+			window.location = x;
+		}
 		var s = Secrets.session;
 		var m = "Démarrage de secrets [" + version_secrets + "] : " + Util.dh();
 		Util.log(m);
