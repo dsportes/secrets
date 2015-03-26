@@ -50,7 +50,7 @@ public class StaticServlet extends HttpServlet {
 	}
 	
 	private byte[] convert(InputStream is) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 		String line;
 		StringBuffer sb = new StringBuffer();
 		while( (line = br.readLine()) != null) {
