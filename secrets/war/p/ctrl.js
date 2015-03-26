@@ -2,8 +2,7 @@ window.addEventListener('polymer-ready', function(){
 	Secrets.init();
 });
 
-Secrets.session.appUrlRoot = "/p/app_";
-Secrets.session.appUrl = Secrets.session.appUrlRoot + version_secrets + ".html";
+Secrets.session.appUrlRoot = "/p/app";
 
 Secrets.showAide = function(arg){
 	var event = new CustomEvent("secrets-aide", {detail: arg, bubbles: false});

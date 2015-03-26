@@ -342,8 +342,7 @@ secretsApp.directive('panelChangerident', function() {
 
 /***************************************************/
 secretsApp.controller("secretsCtrl", ["$scope", "$timeout", function ($scope, $timeout) {
-		Secrets.session.appUrlRoot = "/a/app_";
-		Secrets.session.appUrl = Secrets.session.appUrlRoot + version_secrets + ".html";
+		Secrets.session.appUrlRoot = "/a/app";
 
 		Secrets.showAide = function(arg){
 			// Util.log(arg.arg + " : " + arg.estRef);

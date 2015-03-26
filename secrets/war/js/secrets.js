@@ -897,10 +897,12 @@ Serveur = {
 		   			Secrets.srvVersion = data.version;
 		   			Util.log("Version de l'application sur le serveur : " + Secrets.srvVersion);
 		   			if (Secrets.srvVersion != version_secrets) {
-		   				Secrets.session.appUrl = Secrets.session.appUrlRoot + Secrets.srvVersion + ".html";
-		   				window.alert("Une nouvelle version est disponible.\nL'application va être relancée pour la charger.");
+		   				var nurl = Secrets.session.appUrlRoot + "_" + Secrets.srvVersion + ".html";
+		   				// var nurl = Secrets.session.appUrlRoot + ".html";
+		   				window.alert("Version actuelle : " + version_secrets + "\nLa version " +
+		   						Secrets.srvVersion + " est disponible.\nL'application va être relancée pour la charger.");
 		   				setTimeout(function(){
-		   					window.location = Secrets.session.appUrl + (location.hash.length ? location.hash : "");
+		   					window.location = nurl + (location.hash.length ? location.hash : "");
 		   				}, 200);
 		   			}
 		   		}

@@ -32,6 +32,11 @@ public class StaticServlet extends HttpServlet {
 				if (name.endsWith("app.html")) {
 					String namex = name.substring(0, name.length() - 5) + "_.html";
 					is = servletConfig.getServletContext().getResourceAsStream(namex);
+				} else {
+					if (name.endsWith("offline.appcache")) {
+						String namex = name.substring(0, name.length() - 9) + "_.appcache";
+						is = servletConfig.getServletContext().getResourceAsStream(namex);
+					}
 				}
 				if (is == null)
 					return null;
@@ -153,9 +158,11 @@ public class StaticServlet extends HttpServlet {
 		}
 		resp.setContentType(mime);
 		resp.setContentLength(bytes.length);
-//		resp.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
-//		resp.setHeader("Pragma", "no-cache"); // HTTP 1.0.
-//		resp.setDateHeader("Expires", 0); // Proxies.
+		if (uri3.endsWith("app.html") || uri3.endsWith("offline.appcache")) {
+			resp.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
+//			resp.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+			resp.setDateHeader("Expires", 0); // Proxies.
+		}
 		resp.getOutputStream().write(bytes);
 		
 //		log.info("GET: " + uri + " -- " + uri3 + " [" + mime + "]");
