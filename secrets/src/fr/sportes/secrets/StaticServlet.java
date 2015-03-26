@@ -28,8 +28,14 @@ public class StaticServlet extends HttpServlet {
 		try {
 			// String n = name.startsWith("/x") ? name.substring(2) : name;
 			InputStream is = servletConfig.getServletContext().getResourceAsStream(name);
-			if (is == null)
-				return null;
+			if (is == null) {
+				if (name.endsWith("app.html")) {
+					String namex = name.substring(0, name.length() - 5) + "_.html";
+					is = servletConfig.getServletContext().getResourceAsStream(namex);
+				}
+				if (is == null)
+					return null;
+			}
 			if (name.endsWith(".css") || name.endsWith(".html") || name.endsWith(".appcache"))
 				return convert(is);
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -77,8 +83,15 @@ public class StaticServlet extends HttpServlet {
 								String r = versions.getProperty(w);
 								if (r == null)
 									sb.append(line.substring(i, j+1));								
-								else
-									sb.append(r);
+								else {
+									int k = w.lastIndexOf('.');
+									if (k == -1)
+										sb.append(r);
+									else {
+										String x = w.substring(0, k) + "_" + r + w.substring(k);
+										sb.append(x);
+									}
+								}
 								s = j + 1;
 							}
 						}
